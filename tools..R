@@ -69,6 +69,21 @@ varsig <- function(data,x=1)
     	return(sub)
         }
 
+
+#function to remove variance column from matrix with variable genes
+#usage: final<-ppmatvar(ok)
+
+
+ppmatvar<-function(data)
+	{
+	n=ncol(data)
+	data2<-data[,2:n]
+	return (data2)
+	}
+
+
+
+
 ##transpose ok (varsig) matrix for PCA
 
 data.pca<-transmat(ok)
