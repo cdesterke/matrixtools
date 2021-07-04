@@ -42,6 +42,7 @@ filtermean<-function(data,tb=0){
         }
 
 
+
 #usage variable matrix keep only variable genes from from dataframe with uniq gene symbol as row.names
 #ok<-varsig(final)
 
@@ -96,4 +97,28 @@ transmat<-function(ok)
 	tmat
 	}
 
+## perform limma 2 groups
+## limmagroup(complete,groups=pheno$group,control="other")
 
+limmagroup<-function(data,groups,control="HD")
+	{
+		{
+    #install require R packages if necessary and load them
+    	if(!require(dplyr)){
+	if (!requireNamespace("BiocManager", quietly = TRUE))
+   	 install.packages("BiocManager")
+	 BiocManager::install("limma")
+	    library(limma)
+        		}
+		}
+	levels <- as.factor(groups)
+	levels<-relevel(levels,ref=control)
+	design <- model.matrix(~levels)
+	rownames(design) = colnames(complete)
+	
+	# perform limma analysis
+	tmp <- lmFit(complete,design=design)
+	fit <- eBayes(tmp)
+	res = topTable(fit,number = nrow(data),coef=2)
+	res
+}
