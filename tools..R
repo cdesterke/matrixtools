@@ -1,3 +1,9 @@
+## plateform
+#unix
+grep -v '^#' GPL91-30375.txt > PLATGPL91.txt
+
+cut -f1,11 PLATGPL91.txt | cat > gpl91.txt
+
 
 #prepare affymetrix platform
 affyplatform<- function(affy)
