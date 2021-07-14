@@ -4,6 +4,67 @@ grep -v '^#' GPL91-30375.txt > PLATGPL91.txt
 
 cut -f1,11 PLATGPL91.txt | cat > gpl91.txt
 
+# R
+gpl91<-read.table("gpl91.txt",h=T,sep="\t")
+
+library(tidyr)
+
+new<-separate(data = gpl91, col = Gene.Symbol, into = c("left", "right"), sep = "\\ ")
+ok<-new[,1:2]
+colnames(ok)<-c("probe","gene")
+row.names(ok)<-ok$probe
+gpl_91<-ok
+
+
+## matrix
+#unix
+grep -v '^!' GSE96-GPL91_series_matrix.txt > GSE96.txt
+
+#R
+gse96<-read.table("GSE96.txt",h=T,sep="\t")
+row.names(gse96)<-gse96$ID_REF
+
+gse96<-gse96[,2:ncol(gse96)]
+
+
+## annotations
+grep -v '^!Sample_source_name_ch1' GSE96-GPL91_series_matrix.txt > GSE96annot.txt
+cat GSE96-GPL91_series_matrix.txt | grep '^!Sample_source_name_ch1'
+
+cat GSE96-GPL91_series_matrix.txt | grep '^!Sample_source_name_ch1' > samples.txt
+
+cat GSE96-GPL91_series_matrix.txt | grep '^!Sample_geo_accession' > id.txt
+
+cat id.txt samples.txt > annot.txt
+#R
+annot<-read.table("annot.txt",h=F,sep="\t")
+annot<-t(annot)
+colnames(annot)<-c("id","group")
+annot<-annot[2:nrow(annot),]
+annot<-data.frame(annot)
+row.names(annot)<-annot$id
+
+##
+library(tidyverse)
+annot$space <- annot$group
+new.annot<-annot %>% unite(concat, id, group, sep="_")
+
+## subset matrix with some sample types
+ngse96<-gse96
+colnames(ngse96)<-new.annot$concat
+brain<-ngse96[,grep("whole.brain",colnames(ngse96))]
+thalamus<-ngse96[,grep("thalamus",colnames(ngse96))]
+df<-data.frame(brain,thalamus)
+
+
+##analyse
+input<-merge(ok,gse96,by="row.names")
+input<-input[,3:ncol(input)]
+
+
+
+
+
 
 #prepare affymetrix platform
 affyplatform<- function(affy)
@@ -11,8 +72,8 @@ affyplatform<- function(affy)
    	if(!require(tidyr)){install.packages("tidyr")}
     	library(tidyr)
 	input<-data.frame(affy)
-	colnames(input)<-c("ID_REF","Gene Symbol")
-	new<-separate(data = input, col = Gene Symbol, into = c("left", "right"), sep = " /// ")
+	colnames(input)<-c("ID_REF","gene")
+	new<-separate(data = input, col = gene, into = c("left", "right"), sep = " /// ")
 	ok<-new[,1:2]
 	colnames(ok)<-c("ID_REF","gene")
 	row.names(ok)<-ok$probe
