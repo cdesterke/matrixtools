@@ -1,3 +1,31 @@
+
+#prepare affymetrix platform
+affyplatform<- function(affy)
+	{
+   	if(!require(tidyr)){install.packages("tidyr")}
+    	library(tidyr)
+	input<-data.frame(affy)
+	colnames(input)<-c("ID_REF","Gene Symbol")
+	new<-separate(data = input, col = Gene Symbol, into = c("left", "right"), sep = " /// ")
+	ok<-new[,1:2]
+	colnames(ok)<-c("ID_REF","gene")
+	row.names(ok)<-ok$probe
+	gpl_new<-ok
+	gpl_new
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 ##filtermatrix usage 1st column nammed "gene" with non uniq gene symbol
 #final<-filtermatrix(data)
 
@@ -122,3 +150,15 @@ limmagroup<-function(data,groups,control="HD")
 	res = topTable(fit,number = nrow(data),coef=2)
 	res
 }
+
+
+
+merge2mat<- function(m1,m2)
+		{
+	dfm1<-data.frame(m1)
+	dfm2<-data.frame(m2)
+	df<-merge(dfm1,dfm2,by="row.names")
+	row.names(df)<-df$Row.names
+	df<-df[,2:ncol(df)]
+	df
+	}
