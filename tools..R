@@ -82,7 +82,9 @@ affyplatform<- function(affy)
 }
 
 
-
+### annot expression matrix
+library(dplyr)
+newp%>%inner_join(matrix,by="ID_REF") %>% select(-ID_REF)%>% head()
 
 
 
